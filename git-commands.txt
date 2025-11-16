@@ -1,0 +1,19 @@
+# Git příkazy pro nahrání na GitHub (použij v Git Bash nebo terminálu)
+
+# 1. Přidej soubor
+git add index.html
+
+# 2. Vytvoř commit
+git commit -m "Initial commit - Clean Bros landing page"
+
+# 3. Přejmenuj branch na main (pokud je potřeba)
+git branch -M main
+
+# 4. Přidej GitHub repository (nahraď VASE-USERNAME svým GitHub uživatelským jménem)
+git remote add origin https://github.com/VASE-USERNAME/clean-bros-chrudim.git
+
+# 5. Nahraj na GitHub
+git push -u origin main
+
+# Pak ještě zapni GitHub Pages přes webové rozhraní (Settings → Pages)
+

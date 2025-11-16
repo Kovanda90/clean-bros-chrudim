@@ -1,0 +1,9 @@
+# robots.txt pro Clean Bros Chrudim
+
+User-agent: *
+Allow: /
+Allow: /zasady-ochrany-osobnich-udaju.html
+
+# Sitemap (pokud bude vytvořena)
+# Sitemap: https://kovanda90.github.io/clean-bros-chrudim/sitemap.xml
+
