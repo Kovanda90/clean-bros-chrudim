@@ -229,6 +229,19 @@
             box-shadow: var(--shadow-lg);
         }
         
+        .cta-button:disabled {
+            background-color: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+        
+        .cta-button:disabled:hover {
+            background-color: var(--text-light);
+            transform: none;
+            box-shadow: var(--shadow);
+        }
+        
         .hamburger {
             display: flex;
             flex-direction: column;
@@ -973,7 +986,7 @@
                     <div class="contact-form" id="formular">
                         <h3 style="margin-bottom: 1.5rem;">Nezávazná poptávka</h3>
                         <div class="form-message" id="formMessage"></div>
-                        <form id="contactForm">
+                        <form id="contactForm" action="https://formspree.io/f/xblqvqdj" method="POST">
                             <div class="form-group">
                                 <label for="name">Jméno a příjmení <span class="required">*</span></label>
                                 <input type="text" id="name" name="name" required>
@@ -1022,6 +1035,10 @@
                                     </label>
                                 </div>
                             </div>
+                            <!-- Hidden fields for Formspree -->
+                            <input type="hidden" name="_subject" value="Nová poptávka z webu - Clean Bros Chrudim">
+                            <input type="hidden" name="_format" value="plain">
+                            <input type="hidden" name="_next" value="">
                             <button type="submit" class="cta-button" style="width: 100%;">Odeslat poptávku</button>
                         </form>
                     </div>
@@ -1136,8 +1153,9 @@
         // Form validation and submission
         const contactForm = document.getElementById('contactForm');
         const formMessage = document.getElementById('formMessage');
+        const submitButton = contactForm.querySelector('button[type="submit"]');
         
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             // Get form values
@@ -1177,16 +1195,55 @@
                 return;
             }
             
-            // Simulate form submission
-            // In a real scenario, this would send data to a server
-            formMessage.textContent = 'Děkujeme za vaši poptávku! Ozveme se vám do 24 hodin.';
+            // Disable submit button and show loading
+            submitButton.disabled = true;
+            submitButton.textContent = 'Odesílám...';
+            formMessage.textContent = 'Odesílám poptávku, prosím počkejte...';
             formMessage.className = 'form-message success show';
             
-            // Reset form
-            contactForm.reset();
-            
-            // Scroll to message
-            formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            try {
+                // Prepare form data for Formspree
+                const formData = new FormData(contactForm);
+                
+                // Add custom field name for better formatting in email
+                formData.append('_subject', 'Nová poptávka z webu - Clean Bros Chrudim');
+                formData.append('_format', 'plain');
+                
+                // Send to Formspree
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    formMessage.textContent = 'Děkujeme za vaši poptávku! Ozveme se vám do 24 hodin.';
+                    formMessage.className = 'form-message success show';
+                    
+                    // Reset form
+                    contactForm.reset();
+                } else {
+                    const data = await response.json();
+                    if (data.errors) {
+                        throw new Error(data.errors.map(error => error.message).join(', '));
+                    } else {
+                        throw new Error('Něco se pokazilo. Zkuste to prosím znovu.');
+                    }
+                }
+            } catch (error) {
+                formMessage.textContent = 'Omlouváme se, nastala chyba při odesílání. Zkuste to prosím znovu nebo nás kontaktujte přímo na e-mailu.';
+                formMessage.className = 'form-message error show';
+                console.error('Form submission error:', error);
+            } finally {
+                // Re-enable submit button
+                submitButton.disabled = false;
+                submitButton.textContent = 'Odeslat poptávku';
+                
+                // Scroll to message
+                formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         });
         
         // Email validation helper
