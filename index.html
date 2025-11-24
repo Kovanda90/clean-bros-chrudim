@@ -1270,6 +1270,11 @@
                 });
                 
                 if (response.ok) {
+                    // GA4 – konverze odeslání formuláře
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'form_submit');
+                    }
+                    
                     formMessage.textContent = 'Děkujeme za vaši poptávku! Ozveme se vám do 24 hodin.';
                     formMessage.className = 'form-message success show';
                     
@@ -1305,5 +1310,6 @@
     </script>
 </body>
 </html>
+
 
 
